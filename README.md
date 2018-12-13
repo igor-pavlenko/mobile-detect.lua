@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/yourpalmark/mobile-detect.lua.svg?branch=master)](https://travis-ci.org/yourpalmark/mobile-detect.lua)
+[![Build Status](https://travis-ci.org/igor-pavlenko/mobile-detect.lua.svg?branch=master)](https://travis-ci.org/igor-pavlenko/mobile-detect.lua)
 
 # mobile-detect.lua
 
