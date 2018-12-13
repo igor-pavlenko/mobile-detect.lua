@@ -9,9 +9,9 @@ before_install:
 install:
 # OpenResty
 - sudo apt-get -y install libreadline-dev libncurses5-dev libpcre3-dev libssl-dev perl make build-essential
-- wget https://openresty.org/download/openresty-1.9.7.4.tar.gz
-- tar xzvf openresty-1.9.7.4.tar.gz
-- cd openresty-1.9.7.4/
+- wget https://openresty.org/download/openresty-1.13.6.2.tar.gz
+- tar xzvf openresty-1.13.6.2.tar.gz
+- cd openresty-1.13.6.2/
 - ./configure
   --prefix=/usr/local/openresty
   --with-debug
@@ -32,9 +32,9 @@ install:
 - export PATH=/usr/local/openresty/bin:/usr/local/openresty/luajit/bin:/usr/local/openresty/nginx/sbin:$PATH
 
 # LuaRocks
-- wget http://keplerproject.github.io/luarocks/releases/luarocks-2.3.0.tar.gz
-- tar xzvf luarocks-2.3.0.tar.gz
-- cd luarocks-2.3.0/
+- wget http://luarocks.github.io/luarocks/releases/luarocks-3.0.4.tar.gz
+- tar xzvf luarocks-3.0.4.tar.gz
+- cd luarocks-3.0.4/
 - ./configure --lua-suffix=jit --with-lua-include=/usr/local/openresty/luajit/include/luajit-2.1
 - sudo make bootstrap
 - cd ../
