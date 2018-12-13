@@ -395,13 +395,13 @@ end
 -----
 -- Convert properties to regex
 -- @param   table
---local function convert_properties_to_regex(table)
---    for k, v in pairs(table) do
---        if table[k] ~= nil then
---            table[k] = rex.new(table[k], 'i')
---        end
---    end
---end
+local function convert_properties_to_regex(table)
+    for k, v in pairs(table) do
+        if table[k] ~= nil then
+            table[k] = rex.new(table[k], 'i')
+        end
+    end
+end
 
 -----
 -- Init
@@ -417,17 +417,16 @@ local function init()
                 if ver_pos >= 1 then
                     value = value:sub(1, ver_pos-1) .. '([\\w._\\+]+)' .. value:sub(ver_pos + 5)
                 end
-                --values[i] = rex.new(value, 'i')
-                values[i] = value
+                values[i] = rex.new(value, 'i')
             end
             mobile_detect_rules.properties[key] = values
         end
     end
-    --convert_properties_to_regex(mobile_detect_rules.operating_systems)
-    --convert_properties_to_regex(mobile_detect_rules.phone_devices)
-    --convert_properties_to_regex(mobile_detect_rules.tablet_devices)
-    --convert_properties_to_regex(mobile_detect_rules.browsers)
-    --convert_properties_to_regex(mobile_detect_rules.utilities)
+    convert_properties_to_regex(mobile_detect_rules.operating_systems)
+    convert_properties_to_regex(mobile_detect_rules.phone_devices)
+    convert_properties_to_regex(mobile_detect_rules.tablet_devices)
+    convert_properties_to_regex(mobile_detect_rules.browsers)
+    convert_properties_to_regex(mobile_detect_rules.utilities)
 
     mobile_detect_rules.operating_systems0 = {
         WindowsPhoneOS=mobile_detect_rules.operating_systems.WindowsPhoneOS,
@@ -527,7 +526,7 @@ end
 -- @param   user_agent
 -- @return  boolean
 function impl.is_mobile_fallback(user_agent)
-    return ngx.re.match(user_agent, impl.detect_mobile_browsers.fullPattern, 'i') ~= nil or ngx.re.match(user_agent:sub(1, 5), impl.detect_mobile_browsers.shortPattern, 'i') ~= nil
+    return rex.match(user_agent, impl.detect_mobile_browsers.fullPattern, 1, 'i') ~= nil or rex.match(user_agent:sub(1, 5), impl.detect_mobile_browsers.shortPattern, 1, 'i') ~= nil
 end
 
 -----
@@ -535,7 +534,7 @@ end
 -- @param   user_agent
 -- @return  boolesn
 function impl.is_tablet_fallback(user_agent)
-    return ngx.re.match(user_agent, impl.detect_mobile_browsers.tabletPattern, 'i') ~= nil
+    return rex.match(user_agent, impl.detect_mobile_browsers.tabletPattern, 1, 'i') ~= nil
 end
 
 -----
@@ -862,7 +861,7 @@ end
 -- @param   user_agent  http_header['User-Agent']
 -- @return  boolean     true when the pattern matches, otherwise false
 function mobile_detect.match(pattern, user_agent)
-    return ngx.re.match(user_agent, pattern, 'i')
+    return rex.match(user_agent, pattern, 1, 'i')
 end
 
 -----

@@ -4,31 +4,17 @@ dist: trusty
 language: perl
 
 before_install:
+- wget -qO - https://openresty.org/package/pubkey.gpg | sudo apt-key add -
+- sudo apt-get -y install software-properties-common
+- sudo add-apt-repository -y "deb http://openresty.org/package/ubuntu $(lsb_release -sc) main"
 - sudo apt-get update
 
 install:
 # OpenResty
 - sudo apt-get -y install libreadline-dev libncurses5-dev libpcre3-dev libssl-dev perl make build-essential
-- wget https://openresty.org/download/openresty-1.13.6.2.tar.gz
-- tar xzvf openresty-1.13.6.2.tar.gz
-- cd openresty-1.13.6.2/
-- ./configure
-  --prefix=/usr/local/openresty
-  --with-debug
-  --conf-path=/usr/local/openresty/nginx/conf/nginx.conf
-  --http-log-path=/usr/local/openresty/nginx/logs/access.log
-  --error-log-path=/usr/local/openresty/nginx/logs/error.log
-  --lock-path=/usr/local/openresty/nginx/lock/nginx.lock
-  --pid-path=/usr/local/openresty/nginx/run/nginx.pid
-  --http-client-body-temp-path=/usr/local/openresty/nginx/client_body_temp
-  --http-fastcgi-temp-path=/usr/local/openresty/nginx/fastcgi_temp
-  --http-proxy-temp-path=/usr/local/openresty/nginx/proxy_temp
-  --http-scgi-temp-path=/usr/local/openresty/nginx/scgi_temp
-  --http-uwsgi-temp-path=/usr/local/openresty/nginx/uwsgi_temp
-- make
-- sudo make install
-- cd ../
+- sudo apt-get install openresty
 - sudo mkdir -p /usr/local/openresty/nginx/{logs,lock,run,client_body_temp,fastcgi_temp,proxy_temp,scgi_temp,uwsgi_temp}
+- sudo chmod 0777 /usr/local/openresty/nginx/logs
 - export PATH=/usr/local/openresty/bin:/usr/local/openresty/luajit/bin:/usr/local/openresty/nginx/sbin:$PATH
 
 # LuaRocks
