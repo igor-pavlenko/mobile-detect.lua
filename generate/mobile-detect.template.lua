@@ -21,11 +21,6 @@ if not ok then
     error("cjson module required")
 end
 
-local ok, rex = pcall(require, "rex_pcre")
-if not ok then
-    error("rex_pcre module required")
-end
-
 local mobile_detect = {}
 
 local impl = {}
@@ -90,6 +85,30 @@ local function count(table)
 end
 
 -----
+-- Split string by pattern
+-- @param   string
+-- @param   string
+-- @return  table
+function split(str, pat)
+    local t = {}  -- NOTE: use {n = 0} in Lua-5.0
+    local fpat = "(.-)" .. pat
+    local last_end = 1
+    local s, e, cap = str:find(fpat, 1)
+    while s do
+        if s ~= 1 or cap ~= "" then
+            table.insert(t,cap)
+        end
+        last_end = e+1
+        s, e, cap = str:find(fpat, last_end)
+    end
+    if last_end <= #str then
+        cap = str:sub(last_end)
+        table.insert(t, cap)
+    end
+    return t
+end
+
+-----
 -- Compare strings ignoring case
 -- @param   a   string
 -- @param   b   string
@@ -136,16 +155,11 @@ local function init()
                 if ver_pos >= 1 then
                     value = value:sub(1, ver_pos-1) .. '([\\w._\\+]+)' .. value:sub(ver_pos + 5)
                 end
-                values[i] = rex.new(value, 'i')
+                values[i] = value
             end
             mobile_detect_rules.properties[key] = values
         end
     end
-    convert_properties_to_regex(mobile_detect_rules.operating_systems)
-    convert_properties_to_regex(mobile_detect_rules.phone_devices)
-    convert_properties_to_regex(mobile_detect_rules.tablet_devices)
-    convert_properties_to_regex(mobile_detect_rules.browsers)
-    convert_properties_to_regex(mobile_detect_rules.utilities)
 
     mobile_detect_rules.operating_systems0 = {
         WindowsPhoneOS=mobile_detect_rules.operating_systems.WindowsPhoneOS,
@@ -162,7 +176,7 @@ init()
 function impl.find_match(rules, user_agent)
     for k, v in pairs(rules) do
         if rules[k] ~= nil then
-            if rules[k]:match(user_agent) then
+            if ngx.re.match(user_agent, rules[k], 'i') then
                 return k
             end
         end
@@ -179,7 +193,7 @@ function impl.find_matches(rules, user_agent)
     local result = {}
     for k, v in pairs(rules) do
         if rules[k] ~= nil then
-            if rules[k]:match(user_agent) then
+            if ngx.re.match(user_agent, rules[k], 'i') then
                 table.insert(result, k)
             end
         end
@@ -197,9 +211,9 @@ function impl.get_version_str(property_name, user_agent)
     if properties[property_name] ~= nil then
         local patterns = properties[property_name]
         for k, v in pairs(patterns) do
-            local match = patterns[k]:match(user_agent)
+            local match = ngx.re.match(user_agent, patterns[k], 'i')
             if match ~= nil then
-                return match
+                return match[1]
             end
         end
     end
@@ -223,11 +237,8 @@ end
 -- @return  version number as a floating number
 function impl.prepare_version_num(version)
     local numbers = {}
-    local pattern = [[(\d*)[a-z._ \/\-](\d*)]]
-    for a, b, c in rex.split(version, pattern, 'i') do
-        if b then table.insert(numbers, b) end
-        if c then table.insert(numbers, c) end
-    end
+    local pattern = [[[^%d]+]]
+    numbers = split(version, pattern)
     local len = count(numbers)
     if len == 1 then
         version = numbers[1]
@@ -245,15 +256,15 @@ end
 -- @param   user_agent
 -- @return  boolean
 function impl.is_mobile_fallback(user_agent)
-    return rex.match(user_agent, impl.detect_mobile_browsers.fullPattern, 1, 'i') ~= nil or rex.match(user_agent:sub(1, 5), impl.detect_mobile_browsers.shortPattern, 1, 'i') ~= nil
+    return ngx.re.match(user_agent, impl.detect_mobile_browsers.fullPattern, 'i') ~= nil or ngx.re.match(user_agent:sub(1, 5), impl.detect_mobile_browsers.shortPattern, 'i') ~= nil
 end
 
 -----
 -- More general tablet fallback rules.
 -- @param   user_agent
--- @return  boolesn
+-- @return  boolean
 function impl.is_tablet_fallback(user_agent)
-    return rex.match(user_agent, impl.detect_mobile_browsers.tabletPattern, 1, 'i') ~= nil
+    return ngx.re.match(user_agent, impl.detect_mobile_browsers.tabletPattern, 'i') ~= nil
 end
 
 -----
@@ -542,7 +553,11 @@ end
 -- @param   user_agent  http_header['User-Agent']
 -- @return  boolean     true when the pattern matches, otherwise false
 function mobile_detect.match(pattern, user_agent)
-    return rex.match(user_agent, pattern, 1, 'i')
+    local res = ngx.re.match(user_agent, pattern, 'i')
+    if res then
+        return res[0]
+    end
+    return nil
 end
 
 -----

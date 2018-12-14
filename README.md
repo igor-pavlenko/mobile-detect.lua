@@ -22,8 +22,6 @@ Current `master` branch is using detection logic from **Mobile-Detect@2.8.22**
 * [CJSON](https://github.com/mpx/lua-cjson)
   * If using OpenResty, CJSON is preinstalled
   * If not: `luarocks install lua-cjson`
-* [Lrexlib - PCRE](https://github.com/rrthomas/lrexlib)
-  * `luarocks install lrexlib-PCRE`
 
 # Usage
 
@@ -60,9 +58,10 @@ If you have bug-fixes, new features, etc for this project, please follow the bel
 
 # Testing
 
- * Install Perl (add to PATH)
- * Install [Test::Nginx](https://github.com/openresty/test-nginx): `cpan Test::Nginx`
- * Run: `prove -r t`
+ * docker-compose up -d
+ * docker exec -it openresty-mobile-detect sh
+ * cd /var/www/mobile-detect.lua/
+ * prove t/
 
 # License
 

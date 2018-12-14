@@ -1,0 +1,9 @@
+version: '2'
+services:
+
+  openresty:
+    build: .
+    volumes:
+    - .:/var/www/mobile-detect.lua
+    - ../Mobile-Detect:/var/www/Mobile-Detect
+    container_name: openresty-mobile-detect

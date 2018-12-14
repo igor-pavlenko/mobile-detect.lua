@@ -6,5 +6,6 @@ t/servroot/*
 ########
 .DS_Store
 .Trashes
+.idea
 *.swp
 *.lock
